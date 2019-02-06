@@ -19,11 +19,11 @@ app.listen(8001, function () {
     const axios = require('axios');
     (async() => {
 
-        for(let i = 1; i <= 100; i++) {
+        /* for(let i = 1; i <= 100; i++) {
             let response = await axios.get('http://localhost:8001/api/custom.get').catch(err => console.error(i, err));
             response && console.info(i, response.data);
-            //await sleep(95);
-        }
+            //await sleep(97);
+        } */
     })();
 });
 

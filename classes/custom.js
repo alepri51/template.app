@@ -7,7 +7,13 @@ class Custom extends SecuredAPI {
     }
 
     async get() {
-        return { w: 'hello' };
+        let shadow = await this.$shadowPayload();
+        return { w: 'hello', ...shadow };
+    }
+
+    async void() {
+        //let shadow = await this.$shadowPayload();
+        return void 0
     }
 
     async set() {
