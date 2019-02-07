@@ -1,7 +1,14 @@
 const path = require('path');
+const crypto = require('crypto2');
 
 const { Classes } = require('template.api');
 const { API, SecuredAPI } = Classes();
+
+class Simple extends API {
+    echo(...args) {
+        return args;
+    }
+}
 
 class Custom extends SecuredAPI {
     constructor(...args) {
@@ -32,8 +39,12 @@ class Custom extends SecuredAPI {
     }
 
     async get() {
-        let shadow = await this.$shadowPayload();
+        let shadow = await this.$getPayload();
         return { w: 'hello', ...shadow };
+    }
+
+    async hello(...args) {
+        return { hello: 'world', ...args };
     }
 
     async void() {
@@ -48,8 +59,60 @@ class Custom extends SecuredAPI {
     async err() {
         throw { w: 'hello' };
     }
+
+    async signout() {
+        this.payload.class !== 'Shadow' && (this.payload = await Custom.shadow());
+    }
+
+    async signup({ email, name, password }) {
+        let shadow = await Custom.Models.Shadow.findOne({
+            _id: this.payload._id,
+            email: true
+        });
+
+        if(shadow) {
+            let roles = await Custom.Models.Role.initialize({ service_name: process.env.SERVICE || 'DEFAULT' });
+            let role = roles.filter(role => role.name === 'Users');
+    
+            const new_keys = await crypto.createKeyPair();
+            let { privateKey, publicKey } = new_keys;
+
+            let user = await Custom.Models.Shadow.transformTo(Custom.Models.User, {
+                ...shadow,
+                //hash:
+                role,
+                wallet: {
+                    publicKey,
+                    privateKey
+                }
+            })
+    
+            this.payload = Custom.formatPayload(user);
+        }
+        else throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
+
+        //return this.payload;
+    }
+
+    async signin({ email: address, password }) {
+        address = address || 'user@example.com';
+        password = password || '123';
+
+        let email = await Custom.Models.Email.findOne({
+            address,
+            account: {
+                role: true,
+                email: true
+            }
+        });
+
+        if(email.account) {
+            this.payload = Custom.formatPayload(email.account);
+        }
+        else throw { code: 401, message: 'User not found.'};
+    }
 }
 
 module.exports = {
-    Custom
+    Custom, Simple
 }
