@@ -15,6 +15,13 @@ class Custom extends SecuredAPI {
         super(...args);
     }
 
+    async $executeAction(method_name, target, reciever, ...args) {
+        let response = await super.$executeAction(method_name, target, reciever, ...args);
+
+        typeof(response) === 'object' && (response = { ...response, _sign_: `${this.payload.class}.${this.payload.name}`});
+        return response;
+    }
+
     async avatar() {
         //debugger
         let uploads = path.join(process.cwd(), 'uploads');
@@ -61,7 +68,8 @@ class Custom extends SecuredAPI {
     }
 
     async signout() {
-        this.payload.class !== 'Shadow' && (this.payload = await Custom.shadow());
+        await this.clearCache();
+        this.payload.class !== 'Shadow' && (this.payload = await Custom.shadow(this.payload));
     }
 
     async signup({ email, name, password }) {
@@ -87,6 +95,7 @@ class Custom extends SecuredAPI {
                 }
             })
     
+            await this.signout();
             this.payload = Custom.formatPayload(user);
         }
         else throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
@@ -95,6 +104,9 @@ class Custom extends SecuredAPI {
     }
 
     async signin({ email: address, password }) {
+        if(this.payload.class !== 'Shadow') {
+            throw { code: 403, message: 'Cannot signin again while singed in. Sign out and try again.'};
+        }
         address = address || 'user@example.com';
         password = password || '123';
 
@@ -106,8 +118,11 @@ class Custom extends SecuredAPI {
             }
         });
 
-        if(email.account) {
+        if(email && email.account) {
+            let shadow_id = this.payload.class === 'Shadow' && this.payload._id;
+
             this.payload = Custom.formatPayload(email.account);
+            shadow_id && (this.payload.shadow_id = shadow_id);
         }
         else throw { code: 401, message: 'User not found.'};
     }
