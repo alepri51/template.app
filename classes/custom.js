@@ -18,7 +18,7 @@ class Custom extends SecuredAPI {
     async $executeAction(method_name, target, reciever, ...args) {
         let response = await super.$executeAction(method_name, target, reciever, ...args);
 
-        typeof(response) === 'object' && (response = { ...response, _sign_: `${this.payload.class}.${this.payload.name}`});
+        typeof(response) === 'object' && (response = { ...response, _sign_: `${this.payload.class} -> ${this.payload.name}`});
         return response;
     }
 
@@ -57,6 +57,11 @@ class Custom extends SecuredAPI {
     async void() {
         //let shadow = await this.$shadowPayload();
         return void 0
+    }
+    
+    async simple() {
+        //let shadow = await this.$shadowPayload();
+        return '1000'
     }
 
     async set() {
