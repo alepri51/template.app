@@ -78,10 +78,16 @@ class Custom extends SecuredAPI {
     }
 
     async signup({ email, name, password }) {
+        if(this.payload.class !== 'Shadow') 
+            throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
+
         let shadow = await Custom.Models.Shadow.findOne({
             _id: this.payload._id,
             email: true
         });
+
+        !shadow && (this.payload = await Custom.shadow(this.payload));
+        !shadow && await this.signup({});
 
         if(shadow) {
             let roles = await Custom.Models.Role.initialize({ service_name: process.env.SERVICE || 'DEFAULT' });
@@ -93,6 +99,7 @@ class Custom extends SecuredAPI {
             let user = await Custom.Models.Shadow.transformTo(Custom.Models.User, {
                 ...shadow,
                 //hash:
+                avatar: '',
                 role,
                 wallet: {
                     publicKey,
@@ -100,10 +107,10 @@ class Custom extends SecuredAPI {
                 }
             })
     
-            await this.signout();
+            await this.clearCache();
             this.payload = Custom.formatPayload(user);
         }
-        else throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
+        //else throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
 
         //return this.payload;
     }
@@ -118,7 +125,9 @@ class Custom extends SecuredAPI {
         let email = await Custom.Models.Email.findOne({
             address,
             account: {
-                role: true,
+                role: {
+                    service: true
+                },
                 email: true
             }
         });
