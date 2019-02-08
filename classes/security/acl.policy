@@ -1,0 +1,15 @@
+//permission, role, class, method, resource, token, reason, $options = { strict: true, priority: true }
+
+allow, *, *, *, *, *, 200
+//deny, *, *, *, *, *, { code: 500, message: 'My own internal server error' }
+deny, Anonymous, *, =signout, *, *, { code: 405, message: 'Signout is not allowed for Anonymous users' }
+deny, Users, *, signup, *, *, { code: 405, message: 'Signup is not allowed for signed users' }
+deny, Users, *, signin, *, *, { code: 405, message: 'Signin is not allowed for signed users' }
+deny, *, *, =who, =Shadow, *, { code: 405, message: 'Signin is not allowed for Anonymous users' }
+
+//allow, *, *, signout, { email: '$data.email' }, *
+
+
+//deny, *, *, *, *, *, just string
+//deny, *, *, *, *, *, 404
+//deny, *, *, *, *, *

@@ -133,6 +133,8 @@ class Custom extends SecuredAPI {
         });
 
         if(email && email.account) {
+            await this.who(email.account.class);
+
             let shadow_id = this.payload.class === 'Shadow' && this.payload._id;
 
             this.payload = Custom.formatPayload(email.account);

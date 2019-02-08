@@ -1,0 +1,7 @@
+role = roleMatcher
+class = regExpMatcher
+method = regExpMatcher
+resource = resourceMatcher
+token = regExpMatcher
+reason = immutable
+$options = { strict: true, priority: true }

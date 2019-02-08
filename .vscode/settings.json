@@ -1,0 +1,18 @@
+{
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#33ff007a",
+        "titleBar.inactiveBackground": "#33ff007a",
+        "titleBar.activeForeground": "#0e0505",
+        "titleBar.inactiveForeground": "#fff000"
+    },
+    "editor.formatOnType": false,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+    "editor.tabSize": 4,
+    "editor.autoIndent": true,
+    "editor.detectIndentation": true,
+    "files.associations": {
+        "*.policy": "csv",
+        "*.model": ".csv",
+    },
+  }
