@@ -7,7 +7,7 @@ deny, Users, *, signup, *, *, { code: 405, message: 'Signup is not allowed for s
 deny, Users, *, signin, *, *, { code: 405, message: 'Signin is not allowed for signed users' }
 deny, *, *, =who, =Shadow, *, { code: 405, message: 'Signin is not allowed for Anonymous users' }
 
-//allow, *, *, signout, { email: '$data.email' }, *
+allow, *, *, signout, { email: '$data.email' }, *
 
 
 //deny, *, *, *, *, *, just string
