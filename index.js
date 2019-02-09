@@ -13,8 +13,8 @@ const router = Router({ Classes });
 
 app.use('/api', router);
 
-app.listen(8001, function () {
-    console.log('Example app listening on port 8001!');
+app.listen(process.env.PORT || 8000, function () {
+    console.log(`Example app listening on port ${process.env.PORT || 8000}!`);
 
     const axios = require('axios');
     (async() => {

@@ -13,6 +13,6 @@
     "editor.detectIndentation": true,
     "files.associations": {
         "*.policy": "csv",
-        "*.model": ".csv",
+        "*.model": "csv",
     },
   }

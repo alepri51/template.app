@@ -2,7 +2,7 @@ const path = require('path');
 const crypto = require('crypto2');
 
 const { Classes } = require('template.api');
-const { API, SecuredAPI } = Classes();
+const { API, SecuredAPI } = Classes({ Models: require('../models') });
 
 class Simple extends API {
     echo(...args) {
@@ -73,13 +73,15 @@ class Custom extends SecuredAPI {
     }
 
     async signout() {
-        await this.clearCache();
+        await API.clearCache(this.payload);
         this.payload.class !== 'Shadow' && (this.payload = await Custom.shadow(this.payload));
     }
 
     async signup({ email, name, password }) {
-        if(this.payload.class !== 'Shadow') 
-            throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
+        //await this.isNotShadow(this.payload.class);
+
+        /* if(this.payload.class !== 'Shadow') 
+            throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'}; */
 
         let shadow = await Custom.Models.Shadow.findOne({
             _id: this.payload._id,
@@ -107,7 +109,7 @@ class Custom extends SecuredAPI {
                 }
             })
     
-            await this.clearCache();
+            await API.clearCache(this.payload);
             this.payload = Custom.formatPayload(user);
         }
         //else throw { code: 403, message: 'Cannot signup while singed in. Sign out and try again.'};
@@ -116,9 +118,12 @@ class Custom extends SecuredAPI {
     }
 
     async signin({ email: address, password }) {
-        if(this.payload.class !== 'Shadow') {
+        //await this.isNotShadow(this.payload.class);
+
+        /* if(this.payload.class !== 'Shadow') {
             throw { code: 403, message: 'Cannot signin again while singed in. Sign out and try again.'};
-        }
+        } */
+
         address = address || 'user@example.com';
         password = password || '123';
 
@@ -133,7 +138,7 @@ class Custom extends SecuredAPI {
         });
 
         if(email && email.account) {
-            await this.who(email.account.class);
+            await this.isShadow(email.account.class);
 
             let shadow_id = this.payload.class === 'Shadow' && this.payload._id;
 
